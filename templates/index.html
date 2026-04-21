@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Analytics Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #0f172a; color: #e2e8f0; padding: 24px; }
+    h1   { font-size: 22px; margin-bottom: 24px; color: #f8fafc; }
+
+    .kpi-bar { display: flex; gap: 16px; margin-bottom: 28px; }
+    .kpi     { background: #1e293b; border-radius: 12px; padding: 20px 24px; flex: 1; }
+    .kpi h3  { font-size: 12px; color: #94a3b8; margin-bottom: 8px; text-transform: uppercase; }
+    .kpi p   { font-size: 28px; font-weight: 600; }
+    .kpi.green p { color: #34d399; }
+    .kpi.red   p { color: #f87171; }
+    .kpi.blue  p { color: #60a5fa; }
+
+    .charts  { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 28px; }
+    .card    { background: #1e293b; border-radius: 12px; padding: 20px; }
+    .card h2 { font-size: 15px; margin-bottom: 16px; color: #cbd5e1; }
+
+    .filters { display: flex; gap: 12px; margin-bottom: 16px; }
+    select, input {
+      background: #1e293b; color: #e2e8f0; border: 1px solid #334155;
+      border-radius: 8px; padding: 8px 12px; font-size: 13px;
+    }
+    table  { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid #1e293b; }
+    th     { background: #1e293b; color: #94a3b8; }
+    tr:hover { background: #1e293b55; }
+    .badge   { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .success { background: #064e3b; color: #34d399; }
+    .failed  { background: #450a0a; color: #f87171; }
+    .pending { background: #1c1917; color: #fbbf24; }
+    a.export-btn {
+      display: inline-block; background: #3b82f6; color: #fff;
+      padding: 8px 18px; border-radius: 8px; text-decoration: none;
+      font-size: 13px; margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Payment Analytics Dashboard</h1>
+
+  <!-- KPI Cards -->
+  <div class="kpi-bar">
+    <div class="kpi blue">  <h3>Total Transactions</h3><p id="kpi-total">—</p></div>
+    <div class="kpi green"> <h3>Success Rate</h3>      <p id="kpi-success">—</p></div>
+    <div class="kpi red">   <h3>Failed Volume</h3>     <p id="kpi-failed">—</p></div>
+    <div class="kpi">       <h3>Pending</h3>           <p id="kpi-pending">—</p></div>
+  </div>
+
+  <!-- Charts -->
+  <div class="charts">
+    <div class="card"><h2>30-Day Trend</h2>    <canvas id="trendChart"></canvas></div>
+    <div class="card"><h2>Failure Patterns</h2><canvas id="failureChart"></canvas></div>
+  </div>
+
+  <!-- Transaction Table -->
+  <div class="card">
+    <h2>Transactions</h2>
+    <a class="export-btn" href="/api/export">Download CSV</a>
+    <div class="filters">
+      <select id="filter-status"   onchange="loadTable()">
+        <option value="">All Statuses</option>
+        <option value="success">Success</option>
+        <option value="failed">Failed</option>
+        <option value="pending">Pending</option>
+      </select>
+      <select id="filter-category" onchange="loadTable()">
+        <option value="">All Categories</option>
+        <option value="retail">Retail</option>
+        <option value="subscription">Subscription</option>
+        <option value="refund">Refund</option>
+        <option value="marketplace">Marketplace</option>
+      </select>
+    </div>
+    <table>
+      <thead><tr><th>ID</th><th>Amount</th><th>Status</th><th>Category</th><th>Gateway</th><th>Error</th><th>Date</th></tr></thead>
+      <tbody id="tx-body"></tbody>
+    </table>
+  </div>
+
+  <script src="/static/dashboard.js"></script>
+</body>
+</html>
